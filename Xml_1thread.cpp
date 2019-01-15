@@ -24,125 +24,6 @@ string getTime()
     return tmp;
 }
 
-const int BLOCK_SIZE = 1 << 20;
-
-// 禁止赋值构造与拷贝构造
-class Noncopyable{
-protected:
-    Noncopyable(){ }
-    ~Noncopyable(){ }
-private:
-    Noncopyable(const Noncopyable &);
-    Noncopyable & operator=(const Noncopyable &);
-};
-
-// 锁
-class MutexLock{
-public:
-    MutexLock()
-    :_islocking(false)
-    {
-        pthread_mutex_init(&_mutex,NULL);
-    }
-    
-    ~MutexLock()
-    {    pthread_mutex_destroy(&_mutex);    }
-    
-    void lock()
-    {
-        pthread_mutex_lock(&_mutex);
-        _islocking=true;
-    }
-    
-    void unlock()
-    {
-        pthread_mutex_unlock(&_mutex);
-        _islocking=false;
-    }
-    
-    bool status()const
-    {    return _islocking;    }
-    
-    pthread_mutex_t * getMutexLockPtr()
-    {    return & _mutex;    }
-    
-private:
-    MutexLock(const MutexLock&);
-    MutexLock& operator=(const MutexLock&);
-private:
-    bool _islocking;
-    pthread_mutex_t _mutex;
-};
-
-// 智能管理锁
-class MutexLockGuard{
-public:
-    MutexLockGuard(MutexLock &mutex)
-    :_mutex(mutex)
-    {
-        _mutex.lock();
-    }
-    
-    ~MutexLockGuard()
-    {
-        _mutex.unlock();
-    }
-private:
-    MutexLock &_mutex;
-};
-
-
-// 线程类
-class Thread:private Noncopyable{
-    typedef function<void()> ThreadCallback;
-public:
-    Thread(ThreadCallback cb)
-    :_pthId(0)
-    ,_isRunning(false)
-    ,_cb(cb)
-    { }
-    
-    ~Thread()
-    {
-        cout<<"Thread::~Thread()"<<endl;
-        if(_isRunning){
-            pthread_detach(_pthId);//资源回收交给主线程进行托管
-            _isRunning=false;
-        }
-    }
-    
-    void start()
-    {
-        pthread_create(&_pthId,NULL,threadFunc,this);
-        _isRunning = true;
-    }
-    
-    void join()
-    {
-        if(_isRunning){
-            pthread_join(_pthId,NULL);
-            _isRunning = false;
-        }
-    }
-    
-    static void *threadFunc(void *arg)
-    {
-        Thread* p=static_cast<Thread*>(arg);
-        if(p)
-            p->_cb();
-        return NULL;
-    }    
-    
-    pthread_t getId()
-    {
-        return pthread_self();
-    }
-private:
-    pthread_t _pthId;
-    bool _isRunning;
-    ThreadCallback _cb;
-};
-
 enum START_TYPE
 {
     StagorEmptytag_start = 1,
@@ -193,9 +74,6 @@ struct block_info{
     vector<START_INFO> startInfo_array;
 };
 
-
-//class
-
 class CXml{
 public:
     CXml(string file)
@@ -232,7 +110,7 @@ public:
                 {
                     if(commentAndCdata.empty() || (stmp == "]]>" && commentAndCdata.top().stype != CDSECT_start) || (stmp == "-->" && commentAndCdata.top().stype != COMMENT_start))
                     {
-                        cout << "Error===> " << stmp << " in " << end << " invalid match CDSECT_start or CDSECT_start" << endl;
+                        cout << "Error===> [" << sfile << "]:" << stmp << " in " << end << " invalid match CDSECT_start or CDSECT_start" << endl;
                         exit(-1);
                     }
                     
@@ -242,7 +120,7 @@ public:
 
                 if(ldata.empty() || (stmp.substr(1) == "?>" && ldata.back().stype != PI_start) || (stmp[1] == '/' && ldata.back().stype != StagorEmptytag_start))
                 {
-                    cout << "Error===> '>' " << " in " << end << " without '<'" << endl;
+                    cout << "Error===> [" << sfile << "]:'>' " << " in " << end << " without '<'" << endl;
                     exit(-1);
                 }
                 
@@ -256,12 +134,12 @@ public:
                             invalid = true;
                     }
                     if(invalid){
-                        cout << "Error===> '>' " << " in " << end << " without '<'" << endl;
+                        cout << "Error===> [" << sfile << "]:'>' " << " in " << end << " without '<'" << endl;
                         exit(-1);
                     }
                 }
                 if(0 != ldata.back().endpos){
-                    cout << "Error===> '>' " << " in " << end << " without '<'" << endl;
+                    cout << "Error===> [" << sfile << "]:'>' " << " in " << end << " without '<'" << endl;
                     exit(-1);
                 }
                     
@@ -298,7 +176,7 @@ public:
                         }else if("[CDATA[" == stmp.substr(0, 7)){
                             tmp.stype = CDSECT_start;
                         }else{
-                            cout << "Error===> Invalid string:" << stmp << " in pos:" << offset << endl;
+                            cout << "Error===> [" << sfile << "]:Invalid string:" << stmp << " in pos:" << offset << endl;
                             exit(-1);
                         }
                         s_comment = true;
@@ -318,7 +196,7 @@ public:
         
         if(!commentAndCdata.empty())
         {
-            cout << "Error===> CDSECT_start or CDSECT_start in " << commentAndCdata.top().fileoffset << " invalid match" << endl;
+            cout << "Error===> [" << sfile << "]:CDSECT_start or CDSECT_start in " << commentAndCdata.top().fileoffset << " invalid match" << endl;
             exit(-1);
         }
         cout << "\t\t\t" << getTime() << endl;
@@ -343,7 +221,7 @@ public:
         {
             if(CDSECT_start != ldata[i].stype && COMMENT_start != ldata[i].stype && 0 == ldata[i].endpos)    // 形如 <![CDATA[  < >xx</ >  < />  ]]>    或 <!--- <test pattern="SECAM" /><test pattern="NTSC" /> -->
             {
-                cout << "Error===> Invalid format, '<' in " << ldata[i].fileoffset << " without '>'" << endl;
+                cout << "Error===> [" << sfile << "]:Invalid format, '<' in " << ldata[i].fileoffset << " without '>'" << endl;
                 return false;
             }
             
@@ -386,7 +264,7 @@ public:
                             st.pop();
                             break;
                         }
-                        cout << "Error===> CDSECT_start or COMMENT_start in " << st.top().fileoffset << " not match end: " << end << endl;
+                        cout << "Error===> [" << sfile << "]:CDSECT_start or COMMENT_start in " << st.top().fileoffset << " not match end: " << end << endl;
                         exit(-1);
                     }
                 }
@@ -420,7 +298,7 @@ public:
                 string start = tp.attr.substr(1, tp.attr.size() - 1);
                 if(st.empty() || (StagorEmptytag_start != tp.stype) || (StagorEmptytag_start == tp.stype && start != att.substr(2, att.size() - 2)))
                 {
-                    cout << "Error===> Invalid format, " << att << " in " << ldata[i].fileoffset << " without '<'" << endl;
+                    cout << "Error===> [" << sfile << "]:Invalid format, " << att << " in " << ldata[i].fileoffset << " without '<'" << endl;
                     return false;
                 }
                 cout << "Info====> pop :" << tp.attr << "\t start:" << tp.fileoffset << " end:" << ldata[i].endpos << endl;
@@ -454,12 +332,9 @@ int main(int argc, char* argv[])
     if(argc < 2)
         cout << "invalid parameter, please input your file: argv[1]" << endl;
     
-    // 单线程版本测试
     CXml myxml(argv[1]);
     myxml.buildData();
     cout << "============== [ step3 " << argv[1] << " valid:[" << myxml.checkValid() << "] step3 ] ===========" << endl << endl;
 
-    //shared_ptr<Thread> thSh(new Thread(std::bind(&CXml::buildData, &myxml))); // 使用智能指针管理线程
-    //thSh->start();
     return 0;
 }
