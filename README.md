@@ -3,51 +3,42 @@ xml文档解析，合法性检测，debug.xml为非法文档会给出详细提�
 ---
 ---
 ```
-[yangyu@VM_0_3_centos xml_parser]$ ./xml ./debug.xml  <br>
-========================== [ BEGIN  ] ========================== <br>
-########################## [ step 1 ] ########################## <br>
-			2019-01-13 23:47:22 <br>
-Error===> '>'  in 197 without '<' <br>
-[yangyu@VM_0_3_centos xml_parser]$  <br>
-
----
----
-[yangyu@VM_0_3_centos xml_parser]$ sh runs.sh  <br>
-g++ -g xmlParser.cpp -o xml -std=c++11 -lpthread <br>
-========================== [ BEGIN  ] ========================== <br>
-########################## [ step 1 ] ########################## <br>
-			2019-01-13 23:44:30 <br>
-			2019-01-13 23:44:30 <br>
-########################## [ step 1 ] ########################## <br>
-########################## [ step 2 ] ########################## <br>
-check Info====> push:<dia:diagram>	 start:0 <br>
-Info====> push:<dia:diagramdata>	 start:66 <br>
-Info====> push:<dia:attribute1>	 start:89 <br>
-Info====> pop :<dia:attribute1>	 start:89 end:210 <br>
-Info====> pop :<dia:diagramdata>	 start:66 end:232 <br>
-Info====> push:<dia:layer>	 start:237 <br>
-Info====> push:<dia:object1>	 start:287 <br>
-Info====> push:<dia:attribute2>	 start:351 <br>
-Info====> pop :<dia:attribute2>	 start:351 end:489 <br>
-Info====> push:<dia:attribute3>	 start:498 <br>
-Info====> pop :<dia:attribute3>	 start:498 end:600 <br>
-Info====> push:<dia:attribute4>	 start:609 <br>
-Info====> pop :<dia:attribute4>	 start:609 end:796 <br>
-Info====> push:<dia:attribute5>	 start:805 <br>
-Info====> pop :<dia:attribute5>	 start:805 end:899 <br>
-Info====> push:<dia:attribute6>	 start:908 <br>
-Info====> pop :<dia:attribute6>	 start:908 end:997 <br>
-Info====> push:<dia:attribute7>	 start:1006 <br>
-Info====> pop :<dia:attribute7>	 start:1006 end:1093 <br>
-Info====> push:<dia:attribute8>	 start:1102 <br>
-Info====> pop :<dia:attribute8>	 start:1102 end:1190 <br>
-Info====> push:<dia:attribute9>	 start:1199 <br>
-Info====> pop :<dia:attribute9>	 start:1199 end:1285 <br>
-Info====> push:<dia:connections1>	 start:1294 <br>
-Info====> pop :<dia:connections1>	 start:1294 end:1399 <br>
-Info====> pop :<dia:object1>	 start:287 end:1419 <br>
-Info====> push:<dia:object2>	 start:1426 <br>
-Info====> push:<dia:attribute10>	 start:1490 <br>
+[yangyu@VM_0_3_centos xml_parser]$ 
+[yangyu@VM_0_3_centos xml_parser]$ ./xml ./test3.xml 
+========================== [ BEGIN  ] ==========================
+########################## [ step 1 ] ##########################
+			2019-01-15 13:20:27
+			2019-01-15 13:20:27
+########################## [ step 1 ] ##########################
+########################## [ step 2 ] ##########################
+check Info====> push:<dia:diagram>	 start:0
+Info====> push:<dia:diagramdata>	 start:66
+Info====> push:<dia:attribute1>	 start:89
+Info====> pop :<dia:attribute1>	 start:89 end:210
+Info====> pop :<dia:diagramdata>	 start:66 end:232
+Info====> push:<dia:layer>	 start:237
+Info====> push:<dia:object1>	 start:287
+Info====> push:<dia:attribute2>	 start:351
+Info====> pop :<dia:attribute2>	 start:351 end:489
+Info====> push:<dia:attribute3>	 start:498
+Info====> pop :<dia:attribute3>	 start:498 end:600
+Info====> push:<dia:attribute4>	 start:609
+Info====> pop :<dia:attribute4>	 start:609 end:796
+Info====> push:<dia:attribute5>	 start:805
+Info====> pop :<dia:attribute5>	 start:805 end:899
+Info====> push:<dia:attribute6>	 start:908
+Info====> pop :<dia:attribute6>	 start:908 end:997
+Info====> push:<dia:attribute7>	 start:1006
+Info====> pop :<dia:attribute7>	 start:1006 end:1093
+Info====> push:<dia:attribute8>	 start:1102
+Info====> pop :<dia:attribute8>	 start:1102 end:1190
+Info====> push:<dia:attribute9>	 start:1199
+Info====> pop :<dia:attribute9>	 start:1199 end:1285
+Info====> push:<dia:connections1>	 start:1294
+Info====> pop :<dia:connections1>	 start:1294 end:1399
+Info====> pop :<dia:object1>	 start:287 end:1419
+Info====> push:<dia:object2>	 start:1426
+Info====> push:<dia:attribute10>	 start:1490
 Info====> pop :<dia:attribute10>	 start:1490 end:1584
 Info====> push:<dia:attribute11>	 start:1593
 Info====> pop :<dia:attribute11>	 start:1593 end:1709
@@ -90,10 +81,16 @@ Info====> pop :<dia:attribute24>	 start:3433 end:3522
 Info====> pop :<dia:object3>	 start:2525 end:3542
 Info====> pop :<dia:layer>	 start:237 end:3558
 Info====> pop :<dia:diagram>	 start:0 end:3574
-			2019-01-13 23:44:30
-			2019-01-13 23:44:30
+			2019-01-15 13:20:27
+			2019-01-15 13:20:27
 ########################## [ step 2 ] ##########################
 ============== [ step3 ./test3.xml valid:[1] step3 ] ===========
 
-[yangyu@VM_0_3_centos xml_parser]$
+[yangyu@VM_0_3_centos xml_parser]$ 
+[yangyu@VM_0_3_centos xml_parser]$ ./xml ./debug.xml 
+========================== [ BEGIN  ] ==========================
+########################## [ step 1 ] ##########################
+			2019-01-15 13:20:37
+Error===> [./debug.xml]:'>'  in 197 without '<'
+[yangyu@VM_0_3_centos xml_parser]$ 
 ```
